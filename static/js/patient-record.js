@@ -45,8 +45,9 @@ async function loadPatientInfo() {
         const userRole = localStorage.getItem('user_role');
         const isStaff = userRole && (userRole.toLowerCase() === 'staff' || userRole.toLowerCase() === 'nurse');
 
-        // Hide "Share" if not Owner OR if Staff
-        if (patient.permission_level !== 'OWNER' || isStaff) {
+        // Hide "Share" if Staff
+        // User requested to keep it for Physicians (even if shared/non-owner, though backend might block)
+        if (isStaff) {
             const shareBtn = document.getElementById('shareBtn');
             if (shareBtn) shareBtn.style.display = 'none';
         }
@@ -97,7 +98,9 @@ function displayNotes(notes) {
     }
 
     container.innerHTML = notes.map(note => {
-        const date = new Date(note.created_at);
+        // Force UTC interpretation by appending Z if missing
+        const timeString = note.created_at.endsWith('Z') ? note.created_at : note.created_at + 'Z';
+        const date = new Date(timeString);
         const formattedDate = date.toLocaleDateString('en-IN', {
             year: 'numeric',
             month: 'short',
@@ -169,7 +172,8 @@ function displayVitalsTable(vitals) {
     }
 
     tbody.innerHTML = vitals.map(v => {
-        const date = new Date(v.created_at);
+        const timeString = v.created_at.endsWith('Z') ? v.created_at : v.created_at + 'Z';
+        const date = new Date(timeString);
         const formattedDate = date.toLocaleDateString('en-IN', {
             month: 'short',
             day: 'numeric',
@@ -204,7 +208,8 @@ function displayVitalsChart(vitals) {
     const reversedVitals = [...vitals].reverse();
 
     const labels = reversedVitals.map(v => {
-        const date = new Date(v.created_at);
+        const timeString = v.created_at.endsWith('Z') ? v.created_at : v.created_at + 'Z';
+        const date = new Date(timeString);
         return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', timeZone: 'Asia/Kolkata' });
     });
 
