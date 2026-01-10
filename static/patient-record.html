@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Record - VriddhaMitra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0D9488">
+    <link rel="apple-touch-icon" href="/static/icon.png">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Patient Header -->
+        <div class="patient-header">
+            <button class="btn btn-secondary" onclick="goBack()" style="margin-bottom: 1rem;">
+                ← Back to Dashboard
+            </button>
+            <h1 class="patient-name" id="patientName">Loading...</h1>
+            <p class="patient-id" id="patientId">ID: -</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab" onclick="switchTab('overview')">Overview</button>
+            <button class="nav-tab active" onclick="switchTab('notes')">Visits & Notes</button>
+            <button class="nav-tab" onclick="switchTab('vitals')">Vitals History</button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            <!-- Overview Tab -->
+            <div id="overviewTab" class="tab-content">
+                <div class="card">
+                    <h2 style="margin-bottom: 1rem;">Patient Overview</h2>
+                    <div class="overview-grid"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div>
+                            <p style="color: var(--gray-600); font-size: 0.875rem;">Phone Number</p>
+                            <p id="overviewPhone" style="font-weight: 500; font-size: 1.1rem;">-</p>
+                        </div>
+                        <div>
+                            <p style="color: var(--gray-600); font-size: 0.875rem;">Membership Price</p>
+                            <p id="overviewPrice" style="font-weight: 500; font-size: 1.1rem;">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visits & Notes Tab -->
+            <div id="notesTab" class="tab-content active">
+                <div class="section-header">
+                    <h2 class="section-title">Clinical Timeline</h2>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-secondary" onclick="showReportModal()">
+                            Report
+                        </button>
+                        <button id="shareBtn" class="btn btn-secondary" onclick="showShareModal()">
+                            Share
+                        </button>
+                        <button id="addNoteBtn" class="btn btn-primary" onclick="showAddNoteModal()">
+                            + Add Note
+                        </button>
+                    </div>
+                </div>
+
+                <div id="timelineContainer" class="timeline">
+                    <p style="text-align: center; color: var(--gray-500);">Loading notes...</p>
+                </div>
+            </div>
+
+            <!-- Vitals History Tab -->
+            <div id="vitalsTab" class="tab-content">
+                <div class="section-header">
+                    <h2 class="section-title">Vitals Trends</h2>
+                    <button id="addVitalsBtn" class="btn btn-primary" onclick="showAddVitalsModal()">
+                        + Log New
+                    </button>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="vitalsChart"></canvas>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 1rem;">History Log</h3>
+                    <table class="vitals-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>BP</th>
+                                <th>HR</th>
+                                <th>Temp</th>
+                                <th>SpO2</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vitalsTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--gray-500);">Loading vitals...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Note Modal -->
+    <div id="addNoteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add Clinical Note</h2>
+                <button class="close-btn" onclick="closeAddNoteModal()">&times;</button>
+            </div>
+
+            <!-- Voice Recorder -->
+            <div class="voice-recorder">
+                <p style="margin-bottom: 1rem; font-weight: 600;">Voice Recording</p>
+                <button id="recordBtn" class="record-btn" onclick="toggleRecording()">
+                    Record
+                </button>
+                <p id="recordingStatus" class="recording-status" style="opacity: 0;">Ready to record</p>
+                <p style="font-size: 0.875rem; color: var(--gray-600); margin-top: 0.5rem;">
+                    Click to record, click again to stop
+                </p>
+            </div>
+
+            <form id="addNoteForm">
+                <div class="form-group">
+                    <label for="notes">Clinical Notes</label>
+                    <textarea id="notes" rows="10" placeholder="Enter clinical notes or use voice recording..."
+                        required></textarea>
+                    <p style="font-size: 0.875rem; color: var(--gray-600); margin-top: 0.5rem;">
+                        Record voice or type manually
+                    </p>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                    Save Note
+                </button>
+
+                <div id="addNoteError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Vitals Modal -->
+    <div id="addVitalsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Log Vitals</h2>
+                <button class="close-btn" onclick="closeAddVitalsModal()">&times;</button>
+            </div>
+
+            <form id="addVitalsForm">
+                <div class="form-group">
+                    <label for="systolicBP">Systolic BP (mmHg)</label>
+                    <input type="number" id="systolicBP" placeholder="120">
+                </div>
+
+                <div class="form-group">
+                    <label for="diastolicBP">Diastolic BP (mmHg)</label>
+                    <input type="number" id="diastolicBP" placeholder="80">
+                </div>
+
+                <div class="form-group">
+                    <label for="heartRate">Heart Rate (bpm)</label>
+                    <input type="number" id="heartRate" placeholder="72">
+                </div>
+
+                <div class="form-group">
+                    <label for="temperature">Temperature (°F)</label>
+                    <input type="number" step="0.1" id="temperature" placeholder="98.6">
+                </div>
+
+                <div class="form-group">
+                    <label for="spo2">SpO2 (%)</label>
+                    <input type="number" id="spo2" placeholder="98">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                    Save Vitals
+                </button>
+
+                <div id="addVitalsError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Share Patient</h2>
+                <button class="close-btn" onclick="closeShareModal()">&times;</button>
+            </div>
+            <p style="color: var(--gray-600); margin-bottom: 1rem;">Share this patient record with another physician or
+                staff member.</p>
+
+            <form id="shareForm">
+                <div class="form-group">
+                    <label for="shareEmail">User Email</label>
+                    <input type="email" id="shareEmail" placeholder="doctor@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="sharePermission">Permission</label>
+                    <select id="sharePermission">
+                        <option value="VIEW">View Only</option>
+                        <option value="EDIT">View & Edit</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                    Share Access
+                </button>
+                <div id="shareError" class="error-message"></div>
+            </form>
+
+            <div style="margin-top: 2rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Shared With</h3>
+                <div id="sharedList" style="background: var(--gray-50); padding: 0.5rem; border-radius: 8px;">
+                    <p style="font-size: 0.875rem; color: var(--gray-500); text-align: center;">Not shared with anyone
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Generate Report</h2>
+                <button class="close-btn" onclick="closeReportModal()">&times;</button>
+            </div>
+
+            <form id="reportForm">
+                <div class="form-group">
+                    <label for="reportPeriod">Time Period</label>
+                    <select id="reportPeriod" onchange="toggleCustomDates()">
+                        <option value="week">Past Week</option>
+                        <option value="month">Past Month</option>
+                        <option value="all">All Time</option>
+                        <option value="custom">Custom Date</option>
+                    </select>
+                </div>
+
+                <div id="customDateFields"
+                    style="display: none; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="startDate">From</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="endDate">To</label>
+                        <input type="date" id="endDate">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-secondary btn-full">
+                    Generate PDF Report
+                </button>
+                <div id="reportError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/patient-record.js"></script>
+    <script src="/static/js/voice-recorder.js"></script>
+</body>
+
+</html>

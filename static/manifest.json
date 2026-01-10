@@ -1,0 +1,16 @@
+{
+    "name": "VriddhaMitra",
+    "short_name": "VriddhaMitra",
+    "start_url": "/static/index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#0D9488",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "/static/icon.png",
+            "sizes": "1024x1024",
+            "type": "image/png"
+        }
+    ]
+}

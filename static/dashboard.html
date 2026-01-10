@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - VriddhaMitra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0D9488">
+    <link rel="apple-touch-icon" href="/static/icon.png">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div>
+                    <h1 class="dashboard-title">VriddhaMitra</h1>
+                    <p class="dashboard-subtitle" id="welcomeText">Welcome back!</p>
+                </div>
+                <button onclick="logout()"
+                    style="background: transparent; border: 1px solid white; color: white; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem;">
+                    Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            <div class="section-header">
+                <h2 class="section-title">My Assigned Patients</h2>
+                <button id="addPatientBtn" class="btn btn-accent" onclick="showAddPatientModal()">
+                    + Add New Patient
+                </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search by name or phone...">
+                <button class="btn btn-secondary" onclick="searchPatients()">
+                    Search Patients
+                </button>
+            </div>
+
+            <!-- Patients List -->
+            <div class="card">
+                <h3 style="margin-bottom: 1.5rem; font-weight: 600;">Assigned Patients:</h3>
+                <div id="patientsList" class="patient-list">
+                    <!-- Patients will be loaded here -->
+                    <p style="text-align: center; color: var(--gray-500);">Loading patients...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Patient Modal -->
+    <div id="addPatientModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Patient • नया मरीज जोड़ें</h2>
+                <button class="close-btn" onclick="closeAddPatientModal()">&times;</button>
+            </div>
+
+            <form id="addPatientForm">
+                <div class="form-group">
+                    <label for="patientName">Patient Name • मरीज का नाम</label>
+                    <input type="text" id="patientName" required placeholder="Enter patient name">
+                </div>
+
+                <div class="form-group">
+                    <label for="patientPhone">Phone Number • फोन नंबर</label>
+                    <input type="tel" id="patientPhone" required placeholder="Enter phone number">
+                </div>
+
+                <div class="form-group">
+                    <label for="membershipPrice">Membership Price • सदस्यता मूल्य</label>
+                    <input type="number" id="membershipPrice" required placeholder="Enter membership price" step="0.01"
+                        min="0">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                    Add Patient • जोड़ें
+                </button>
+
+                <div id="addPatientError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VriddhaMitra - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0D9488">
+    <link rel="apple-touch-icon" href="/static/icon.png">
+</head>
+
+<body class="login-body">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 class="logo-text">VriddhaMitra</h1>
+                <p class="subtitle">VriddhaMitra - Elder Care Platform</p>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="physician@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                    <span>Login</span>
+                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M4 10h12m0 0l-4-4m4 4l-4 4" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
+                    </svg>
+                </button>
+
+                <div id="errorMessage" class="error-message"></div>
+            </form>
+
+            <div class="login-footer">
+                <p>Healthcare Professional Platform</p>
+                <p style="margin-top: 0.5rem;">
+                    <a href="/static/register.html"
+                        style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                        Don't have an account? Register
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <div class="background-pattern"></div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMessage.textContent = '';
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    console.log('Login successful, storing token');
+
+                    // Store JWT token and user info  
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('physician_id', data.user.id);
+                    localStorage.setItem('physician_name', data.user.name);
+                    localStorage.setItem('physician_email', data.user.email);
+                    localStorage.setItem('user_role', data.user.role);
+
+                    // Small delay to ensure localStorage is saved before redirect
+                    setTimeout(() => {
+                        window.location.href = '/static/dashboard.html';
+                    }, 100);
+                } else {
+                    const error = await response.json();
+                    errorMessage.textContent = error.detail || 'Login failed. Please try again.';
+                }
+            } catch (error) {
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                console.error('Login error:', error);
+            }
+        });
+    </script>
+</body>
+
+</html>
